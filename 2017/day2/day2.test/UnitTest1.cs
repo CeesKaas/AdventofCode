@@ -17,6 +17,18 @@ namespace Tests
             var checksumCalculator = new Checksum(input);
             Assert.That(checksumCalculator.Result, Is.EqualTo(expectedChecksum));
         }
+        static object[] GivenExamplesPart2 =
+            {
+            new object[] {new int[][] { new[] {5,9,2,8 }, new[] { 9,4,7,3 }, new[] { 3,8,6,5}}, 9}};
+
+
+        [Test]
+        [TestCaseSource(nameof(GivenExamplesPart2))]
+        public void Checksum2ResultTest(int[][] input, int expectedChecksum)
+        {
+            var checksumCalculator = new Checksum2(input);
+            Assert.That(checksumCalculator.Result, Is.EqualTo(expectedChecksum));
+        }
         [Test]
         [TestCase(new[] { 5, 1, 9, 5 }, 1, 9)]
         [TestCase(new[] { 7, 5, 3 }, 3, 7)]
@@ -54,7 +66,7 @@ namespace Tests
         {
             new object[] { @"5 1 9 5
 7 5 3
-2 4 6 8", new int[][]{new []{5,1,9,5},new []{7,5,3},new []{2,4,6,8}, }
+2 4 6 8", new int[][]{new []{5,1,9,5},new []{7,5,3},new []{2,4,6,8}}
         } };
     }
 }
