@@ -16,9 +16,16 @@ namespace day1
             }
             var input = Summer.ExtractArrayFromString(inputString.Trim());
 
-            var result = Summer.DoWork(input);
+            {
+                var result = Summer.DoWork(input);
 
-            Console.WriteLine(result);
+                Console.WriteLine(result);
+            }
+            {
+                var result = Summer.DoWorkPart2(input);
+
+                Console.WriteLine(result);
+            }
 
             Console.Read();
         }

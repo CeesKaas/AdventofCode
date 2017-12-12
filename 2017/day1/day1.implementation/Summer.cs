@@ -10,15 +10,34 @@ namespace day1.implementation
         public static int DoWork(ICollection<int> input)
         {
             var aggregate = input.Circular().Aggregate((sum: 0, last: -1), (accumulate, current) =>
+            {
+                if (accumulate.last == current)
                 {
-                    if (accumulate.last == current)
-                    {
-                        accumulate.sum += current;
-                    }
-                    accumulate.last = current;
-                    return accumulate;
-                });
+                    accumulate.sum += current;
+                }
+                accumulate.last = current;
+                return accumulate;
+            });
             return aggregate.sum;
+        }
+        public static int DoWorkPart2(ICollection<int> input)
+        {
+            if (input.Count % 2 == 1)
+            {
+                throw new ArgumentOutOfRangeException(nameof(input), "input must have an even length");
+            }
+            var sum = 0;
+            int count = input.Count / 2;
+            var a = input.Take(count).ToList();
+            var b = input.Skip(count).Take(count).ToList();
+            for (int i = 0; i < count; i++)
+            {
+                if (a[i] == b[i])
+                {
+                    sum += a[i] + b[i];
+                }
+            }
+            return sum;
         }
 
         public static int[] ExtractArrayFromString(string inputString)
