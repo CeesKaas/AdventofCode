@@ -5,4 +5,8 @@
     <TargetFramework>netcoreapp2.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\day1.implementation\day1.implementation.csproj" />
+  </ItemGroup>
+
 </Project>

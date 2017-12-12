@@ -20,7 +20,18 @@ namespace day1.implementation
                 });
             return aggregate.sum;
         }
+
+        public static int[] ExtractArrayFromString(string inputString)
+        {
+            int[] input = new int[inputString.Length];
+            for (int i = 0; i < inputString.Length; i++)
+            {
+                input[i] = inputString[i] - '0';
+            }
+            return input;
+        }
     }
+
     internal static class CircularCollectionExtensions
     {
         public static IEnumerable<T> Circular<T>(this ICollection<T> input)
