@@ -1,37 +1,46 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Numerics;
+using System.Threading;
 
 namespace day18.implementation
 {
     public class SoundProgram
     {
-        public BigInteger LastRecoveredValue => _registers["LastRecoveredSound"];
+        public BigInteger SentNumbers => _registers["SentNumbers"];
         private List<Instruction> _instructions = new List<Instruction>();
         private Registers _registers = new Registers();
+        public Queue<BigInteger> OutputQueue { get; } = new Queue<BigInteger>();
 
-        public static SoundProgram Parse(string input)
+        public ManualResetEventSlim WaitingForInput { get; } = new ManualResetEventSlim();
+        public Registers Registers => _registers;
+
+        public static SoundProgram Parse(int programId, string input)
         {
             var result = new SoundProgram();
             var lines = input.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
             foreach (var line in lines)
             {
-                result._instructions.Add(Instruction.Parse(line));
+                result._instructions.Add(Instruction.Parse(line, result.OutputQueue, result.WaitingForInput));
             }
+            result._registers["p"] = programId;
+            result._registers["programId"] = programId;
             return result;
         }
 
-        public void Execute()
+        public void Execute(Queue<BigInteger> inputQueue, ManualResetEventSlim othersWaitingForInput)
         {
             for (int i = 0; i < _instructions.Count;)
             {
-                _instructions[i].Execute(ref i, _registers);
+                _instructions[i].Execute(ref i, _registers, inputQueue, othersWaitingForInput);
+                //Console.WriteLine($"{_registers["programId"]}: {i}, {_instructions[i].GetType()}");
             }
         }
     }
     public abstract class Instruction
     {
-        public static Instruction Parse(string instruction)
+        public static Instruction Parse(string instruction, Queue<BigInteger> outputQueue, ManualResetEventSlim WaitingForInput)
         {
             var parts = instruction.Split(' ');
             switch (parts[0])
@@ -45,16 +54,16 @@ namespace day18.implementation
                 //mod a 5
                 case "mod": return new Modulus(parts[1], parts[2]);
                 //snd a
-                case "snd": return new PlaySound(parts[1]);
+                case "snd": return new Send(parts[1], outputQueue);
                 //rcv a
-                case "rcv": return new RecoverLastPlayedSound(parts[1]);
+                case "rcv": return new Receive(parts[1], outputQueue, WaitingForInput);
                 //jgz a -2
                 case "jgz": return new JumpIfGreaterThenZero(parts[1], parts[2]);
             }
             return null;
         }
 
-        public virtual void Execute(ref int instructionPointer, Registers registers)
+        public virtual void Execute(ref int instructionPointer, Registers registers, Queue<BigInteger> inputQueue, ManualResetEventSlim othersWaitingForInput)
         {
             instructionPointer++;
         }
@@ -71,7 +80,7 @@ namespace day18.implementation
         public string Register { get; }
         public string Value { get; }
 
-        public override void Execute(ref int instructionPointer, Registers registers)
+        public override void Execute(ref int instructionPointer, Registers registers, Queue<BigInteger> inputQueue, ManualResetEventSlim othersWaitingForInput)
         {
             if (int.TryParse(Value, out int value))
             {
@@ -81,7 +90,7 @@ namespace day18.implementation
             {
                 registers[Register] = registers[Value];
             }
-            base.Execute(ref instructionPointer, registers);
+            base.Execute(ref instructionPointer, registers, inputQueue, othersWaitingForInput);
         }
     }
     public class Add : Instruction
@@ -94,7 +103,7 @@ namespace day18.implementation
             Register = register;
             Value = value;
         }
-        public override void Execute(ref int instructionPointer, Registers registers)
+        public override void Execute(ref int instructionPointer, Registers registers, Queue<BigInteger> inputQueue, ManualResetEventSlim othersWaitingForInput)
         {
             if (int.TryParse(Value, out int value))
             {
@@ -104,7 +113,7 @@ namespace day18.implementation
             {
                 registers[Register] += registers[Value];
             }
-            base.Execute(ref instructionPointer, registers);
+            base.Execute(ref instructionPointer, registers, inputQueue, othersWaitingForInput);
         }
     }
     public class Multiply : Instruction
@@ -117,7 +126,7 @@ namespace day18.implementation
             Register = register;
             Value = value;
         }
-        public override void Execute(ref int instructionPointer, Registers registers)
+        public override void Execute(ref int instructionPointer, Registers registers, Queue<BigInteger> inputQueue, ManualResetEventSlim othersWaitingForInput)
         {
             if (int.TryParse(Value, out int value))
             {
@@ -127,7 +136,7 @@ namespace day18.implementation
             {
                 registers[Register] *= registers[Value];
             }
-            base.Execute(ref instructionPointer, registers);
+            base.Execute(ref instructionPointer, registers, inputQueue, othersWaitingForInput);
         }
     }
     public class Modulus : Instruction
@@ -140,7 +149,7 @@ namespace day18.implementation
             Register = register;
             Value = value;
         }
-        public override void Execute(ref int instructionPointer, Registers registers)
+        public override void Execute(ref int instructionPointer, Registers registers, Queue<BigInteger> inputQueue, ManualResetEventSlim othersWaitingForInput)
         {
             if (int.TryParse(Value, out int value))
             {
@@ -150,42 +159,67 @@ namespace day18.implementation
             {
                 registers[Register] = registers[Register] % registers[Value];
             }
-            base.Execute(ref instructionPointer, registers);
+            base.Execute(ref instructionPointer, registers, inputQueue, othersWaitingForInput);
         }
     }
-    public class PlaySound : Instruction
+    public class Send : Instruction
     {
         public string Register { get; }
-        public PlaySound(string register)
+        public Queue<BigInteger> DestinationQueue { get; }
+
+        public Send(string register, Queue<BigInteger> destinationQueue)
         {
             Register = register;
+            DestinationQueue = destinationQueue;
         }
-        public override void Execute(ref int instructionPointer, Registers registers)
+        public override void Execute(ref int instructionPointer, Registers registers, Queue<BigInteger> inputQueue, ManualResetEventSlim othersWaitingForInput)
         {
-            registers["LastPlayedSound"] = registers[Register];
-            base.Execute(ref instructionPointer, registers);
+            registers["SentNumbers"]++;
+            DestinationQueue.Enqueue(registers[Register]);
+            base.Execute(ref instructionPointer, registers, inputQueue, othersWaitingForInput);
         }
     }
-    public class RecoverLastPlayedSound : Instruction
+    public class Receive : Instruction
     {
-        public RecoverLastPlayedSound(string registerToCheck)
+        public Receive(string registerToStoreRetrievedValueIn, Queue<BigInteger> destinationQueue, ManualResetEventSlim waitingForInput)
         {
-            RegisterToCheck = registerToCheck;
+            RegisterToStoreRetrievedValueIn = registerToStoreRetrievedValueIn;
+            _destinationQueue = destinationQueue;
+            _waitingForInput = waitingForInput;
         }
 
-        public string RegisterToCheck { get; }
+        public string RegisterToStoreRetrievedValueIn { get; }
 
-        public override void Execute(ref int instructionPointer, Registers registers)
+        private readonly Queue<BigInteger> _destinationQueue;
+        private ManualResetEventSlim _waitingForInput;
+        public override void Execute(ref int instructionPointer, Registers registers, Queue<BigInteger> inputQueue, ManualResetEventSlim othersWaitingForInput)
         {
-            if (registers[RegisterToCheck] != 0)
+            registers["ReceivedNumbers"]++;
+            int tries = 100;
+            while (--tries>0)
             {
-                registers["LastRecoveredSound"] = registers["LastPlayedSound"];
-                instructionPointer = int.MaxValue;
+                try
+                {
+                    BigInteger value = inputQueue.Dequeue();
+                    _waitingForInput.Reset();
+                    registers[RegisterToStoreRetrievedValueIn] = value;
+                    base.Execute(ref instructionPointer, registers, inputQueue, othersWaitingForInput);
+                    return;
+                }
+                catch (InvalidOperationException)
+                {
+                    _waitingForInput.Set();
+                    Thread.Sleep(100);
+                    /*if (othersWaitingForInput.IsSet && _destinationQueue.Count == 0)
+                    {
+                        Console.WriteLine("deadlock");
+                        instructionPointer = int.MaxValue;
+                        return;
+                    }*/
+                }
             }
-            else
-            {
-                base.Execute(ref instructionPointer, registers);
-            }
+            Console.WriteLine("deadlock");
+            instructionPointer = int.MaxValue;
         }
     }
     public class JumpIfGreaterThenZero : Instruction
@@ -199,9 +233,9 @@ namespace day18.implementation
         public string RegisterToCheck { get; }
         public string AmountToJump { get; }
 
-        public override void Execute(ref int instructionPointer, Registers registers)
+        public override void Execute(ref int instructionPointer, Registers registers, Queue<BigInteger> Queue, ManualResetEventSlim othersWaitingForInput)
         {
-            if (registers[RegisterToCheck] > 0)
+            if (ShouldExecute(registers))
             {
                 if (int.TryParse(AmountToJump, out int value))
                 {
@@ -209,13 +243,22 @@ namespace day18.implementation
                 }
                 else
                 {
-                    instructionPointer += (int) registers[AmountToJump];
+                    instructionPointer += (int)registers[AmountToJump];
                 }
             }
             else
             {
                 instructionPointer++;
             }
+        }
+
+        private bool ShouldExecute(Registers registers)
+        {
+            if (int.TryParse(RegisterToCheck, out var fixedValue))
+            {
+                return fixedValue > 0;
+            }
+            return registers[RegisterToCheck] > 0;
         }
     }
 
