@@ -27,7 +27,7 @@ namespace AoC2021
             int count = 0;
             for (int i = 1; i < input.Count; i++)
             {
-                if (input[i - 1] < input[i])
+                if (input[i] > input[i - 1])
                     count++;
             }
             return count;
@@ -40,7 +40,7 @@ namespace AoC2021
             int count = 0;
             for (int i = 1; i < sumsByThree.Count; i++)
             {
-                if (sumsByThree[i - 1] < sumsByThree[i])
+                if (sumsByThree[i] > sumsByThree[i - 1])
                     count++;
             }
             return count;
