@@ -11,18 +11,21 @@ public class Submarine
     public int Horizontal { get; set; }
     public int Depth { get; set; }
 
+    public int Aim { get; set; }
+
     public void Execute(SubmarineCommand submarineCommand)
     {
         switch (submarineCommand.Direction)
         {
             case Direction.Up:
-                Depth -= submarineCommand.Distance;
+                Aim -= submarineCommand.Distance;
                 break;
             case Direction.Down:
-                Depth += submarineCommand.Distance;
+                Aim += submarineCommand.Distance;
                 break;
             case Direction.Forward:
                 Horizontal += submarineCommand.Distance;
+                Depth += Aim * submarineCommand.Distance;
                 break;
             default:
                 throw new InvalidOperationException();

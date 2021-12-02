@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Utilities;
 
-namespace AoC2021.UnitTests;
+namespace AoC2021.UnitTests.DayTests;
 
 internal class Day1Tests
 {
@@ -29,7 +29,7 @@ internal class Day1Tests
 
     private static void PrepareInput(Mock<IInputFetcher> inputMock)
     {
-        inputMock.Setup(m => m.GetTransformedSplitInputForDay<int>(1, It.IsAny<Func<string, int>>())).Returns(Task.FromResult((ICollection<int>)new int[]{
+        inputMock.Setup(m => m.GetTransformedSplitInputForDay(1, It.IsAny<Func<string, int>>())).Returns(Task.FromResult((ICollection<int>)new int[]{
                 199,
                 200,
                 208,

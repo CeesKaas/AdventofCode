@@ -15,7 +15,6 @@ public class Day2
     internal async Task Start()
     {
         Console.WriteLine($"Day 2 part 1 answer: {await Part1()}");
-        Console.WriteLine($"Day 2 part 2 answer: {await Part2()}");
     }
 
     public async Task<int> Part1()
@@ -27,10 +26,5 @@ public class Day2
             sub.Execute(command);
         }
         return sub.Horizontal * sub.Depth;
-    }
-
-    public async Task<int> Part2()
-    {
-        return 0;
     }
 }

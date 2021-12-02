@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Utilities;
 
-namespace AoC2021.UnitTests;
+namespace AoC2021.UnitTests.DayTests;
 
 internal class Day2Tests
 {
@@ -15,14 +15,7 @@ internal class Day2Tests
     {
         var inputMock = PrepareInput();
         var objUnderTest = new Day2(inputMock.Object);
-        Assert.That(await objUnderTest.Part1(), Is.EqualTo(150));
-    }
-    [Test]
-    public async Task TestDay2Part2()
-    {
-        var inputMock = PrepareInput();
-        var objUnderTest = new Day2(inputMock.Object);
-        Assert.That(await objUnderTest.Part2(), Is.EqualTo(0));
+        Assert.That(await objUnderTest.Part1(), Is.EqualTo(900));
     }
 
     private static Mock<InputFetcher> PrepareInput()
