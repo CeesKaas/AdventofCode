@@ -1,6 +1,6 @@
 ﻿using Utilities;
 
-namespace AoC2021;
+namespace AoC2021.Days;
 
 public class Day1
 {
@@ -11,17 +11,17 @@ public class Day1
         _inputFetcher = inputFetcher ?? new InputFetcher();
     }
 
-    internal void Start()
+    internal async Task Start()
     {
-        Console.WriteLine($"Day 1 part 1 answer: {Part1()}");
-        Console.WriteLine($"Day 1 part 2 answer: {Part2()}");
+        Console.WriteLine($"Day 1 part 1 answer: {await Part1()}");
+        Console.WriteLine($"Day 1 part 2 answer: {await Part2()}");
     }
 
-    public int Part1()
+    public async Task<int> Part1()
     {
-        var input = _inputFetcher.GetTransformedSplitInputForDay(1, int.Parse).ToList();
-        int count = 0;
-        for (int i = 1; i < input.Count; i++)
+        var input = (await _inputFetcher.GetTransformedSplitInputForDay(1, int.Parse)).ToList();
+        var count = 0;
+        for (var i = 1; i < input.Count; i++)
         {
             if (input[i] > input[i - 1])
                 count++;
@@ -29,12 +29,12 @@ public class Day1
         return count;
     }
 
-    public int Part2()
+    public async Task<int> Part2()
     {
-        var input = _inputFetcher.GetTransformedSplitInputForDay(1, int.Parse).ToList();
+        var input = (await _inputFetcher.GetTransformedSplitInputForDay(1, int.Parse)).ToList();
         var sumsByThree = SumsByThree(input).ToList();
-        int count = 0;
-        for (int i = 1; i < sumsByThree.Count; i++)
+        var count = 0;
+        for (var i = 1; i < sumsByThree.Count; i++)
         {
             if (sumsByThree[i] > sumsByThree[i - 1])
                 count++;
@@ -44,7 +44,7 @@ public class Day1
 
     private IEnumerable<int> SumsByThree(List<int> input)
     {
-        for (int i = 0; i < input.Count - 2; i++)
+        for (var i = 0; i < input.Count - 2; i++)
         {
             yield return input[i] + input[i + 1] + input[i + 2];
         }

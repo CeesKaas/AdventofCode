@@ -1,6 +1,6 @@
 ﻿using Utilities;
 
-namespace AoC2021;
+namespace AoC2021.Days;
 
 public class Day2
 {
@@ -10,18 +10,18 @@ public class Day2
         _inputFetcher = inputFetcher ?? new InputFetcher();
     }
 
-    internal void Start()
+    internal async Task Start()
     {
-        Console.WriteLine($"Day 2 part 1 answer: {Part1()}");
-        Console.WriteLine($"Day 2 part 2 answer: {Part2()}");
+        Console.WriteLine($"Day 2 part 1 answer: {await Part1()}");
+        Console.WriteLine($"Day 2 part 2 answer: {await Part2()}");
     }
 
-    public int Part1()
+    public async Task<int> Part1()
     {
         return 0;
     }
 
-    public int Part2()
+    public async Task<int> Part2()
     {
         return 0;
     }

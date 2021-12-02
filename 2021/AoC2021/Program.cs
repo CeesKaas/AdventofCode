@@ -1,5 +1,8 @@
-﻿// See https://aka.ms/new-console-template for more information
-using AoC2021;
+﻿using AoC2021.Days;
+using System.Diagnostics;
 
-Console.WriteLine("Hello, World!");
-new Day2().Start();
+Console.WriteLine("Starting");
+var sw = Stopwatch.StartNew();
+await new Day1().Start();
+sw.Stop();
+Console.WriteLine($"Finished executions took: {sw.Elapsed}");
