@@ -1,4 +1,4 @@
-﻿using AoC2021.Days;
+﻿using AoC2020.Days;
 using Moq;
 using NUnit.Framework;
 using System;
@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Utilities;
 
-namespace AoC2021.UnitTests.DayTests;
+namespace AoC2020.UnitTests.DayTests;
 
 internal class DayTemplateTests
 {
