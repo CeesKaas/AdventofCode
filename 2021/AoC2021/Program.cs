@@ -2,4 +2,4 @@
 using AoC2021;
 
 Console.WriteLine("Hello, World!");
-new Day1().Start();
+new Day2().Start();

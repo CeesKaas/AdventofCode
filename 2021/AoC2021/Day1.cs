@@ -1,57 +1,52 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Utilities;
+﻿using Utilities;
 
-namespace AoC2021
+namespace AoC2021;
+
+public class Day1
 {
-    public class Day1
+    private readonly IInputFetcher _inputFetcher;
+
+    public Day1(IInputFetcher? inputFetcher = null)
     {
-        private readonly IInputFetcher _inputFetcher;
+        _inputFetcher = inputFetcher ?? new InputFetcher();
+    }
 
-        public Day1(IInputFetcher? inputFetcher = null)
-        {
-            _inputFetcher = inputFetcher ?? new InputFetcher();
-        }
-        internal void Start()
-        {
-            Console.WriteLine($"Day 1 part 1 answer: {Part1()}");
-            Console.WriteLine($"Day 1 part 2 answer: {Part2()}");
-        }
+    internal void Start()
+    {
+        Console.WriteLine($"Day 1 part 1 answer: {Part1()}");
+        Console.WriteLine($"Day 1 part 2 answer: {Part2()}");
+    }
 
-        public int Part1()
+    public int Part1()
+    {
+        var input = _inputFetcher.GetTransformedSplitInputForDay(1, int.Parse).ToList();
+        int count = 0;
+        for (int i = 1; i < input.Count; i++)
         {
-            var input = _inputFetcher.GetTransformedSplitInputForDay(1, int.Parse).ToList();
-            int count = 0;
-            for (int i = 1; i < input.Count; i++)
-            {
-                if (input[i] > input[i - 1])
-                    count++;
-            }
-            return count;
+            if (input[i] > input[i - 1])
+                count++;
         }
+        return count;
+    }
 
-        public int Part2()
+    public int Part2()
+    {
+        var input = _inputFetcher.GetTransformedSplitInputForDay(1, int.Parse).ToList();
+        var sumsByThree = SumsByThree(input).ToList();
+        int count = 0;
+        for (int i = 1; i < sumsByThree.Count; i++)
         {
-            var input = _inputFetcher.GetTransformedSplitInputForDay(1, int.Parse).ToList();
-            var sumsByThree = SumsByThree(input).ToList();
-            int count = 0;
-            for (int i = 1; i < sumsByThree.Count; i++)
-            {
-                if (sumsByThree[i] > sumsByThree[i - 1])
-                    count++;
-            }
-            return count;
+            if (sumsByThree[i] > sumsByThree[i - 1])
+                count++;
         }
+        return count;
+    }
 
-        private IEnumerable<int> SumsByThree(List<int> input)
+    private IEnumerable<int> SumsByThree(List<int> input)
+    {
+        for (int i = 0; i < input.Count - 2; i++)
         {
-            for (int i = 0; i < input.Count - 2; i++)
-            {
-                yield return input[i] + input[i + 1] + input[i + 2];
-            }
+            yield return input[i] + input[i + 1] + input[i + 2];
         }
     }
 }
