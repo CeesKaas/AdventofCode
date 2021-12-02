@@ -13,22 +13,27 @@ internal class Day2Tests
     [Test]
     public async Task TestDay2Part1()
     {
-        var inputMock = new Mock<IInputFetcher>();
+        var inputMock = PrepareInput();
         var objUnderTest = new Day2(inputMock.Object);
-        PrepareInput(inputMock);
-        Assert.That(await objUnderTest.Part1(), Is.EqualTo(0));
+        Assert.That(await objUnderTest.Part1(), Is.EqualTo(150));
     }
     [Test]
     public async Task TestDay2Part2()
     {
-        var inputMock = new Mock<IInputFetcher>();
+        var inputMock = PrepareInput();
         var objUnderTest = new Day2(inputMock.Object);
-        PrepareInput(inputMock);
         Assert.That(await objUnderTest.Part2(), Is.EqualTo(0));
     }
 
-    private static void PrepareInput(Mock<IInputFetcher> inputMock)
+    private static Mock<InputFetcher> PrepareInput()
     {
-        inputMock.Setup(m => m.GetTransformedSplitInputForDay<int>(1, It.IsAny<Func<string, int>>())).Returns(Task.FromResult((ICollection<int>)new int[0]));
+        var inputMock = new Mock<InputFetcher> { CallBase = true };
+        inputMock.Setup(m => m.FetchInputAsString(2)).Returns(Task.FromResult(@"forward 5
+down 5
+forward 8
+up 3
+down 8
+forward 2"));
+        return inputMock;
     }
 }
