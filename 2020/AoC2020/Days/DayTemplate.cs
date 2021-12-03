@@ -18,6 +18,7 @@ public class DayTemplate
 
     public async Task<int> Part1()
     {
+        var input = (await _inputFetcher.GetTransformedSplitInputForDay(3, s => s.Select(c => c == '#').ToArray())).ToArray();
         return 0;
     }
 
