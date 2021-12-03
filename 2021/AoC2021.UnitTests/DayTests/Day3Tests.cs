@@ -23,7 +23,7 @@ internal class Day3Tests
     {
         var inputMock = PrepareInput();
         var objUnderTest = new Day3(inputMock.Object);
-        Assert.That(await objUnderTest.Part2(), Is.EqualTo(0));
+        Assert.That(await objUnderTest.Part2(), Is.EqualTo(230));
     }
 
     private static Mock<InputFetcher> PrepareInput()
