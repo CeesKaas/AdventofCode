@@ -28,7 +28,7 @@ internal class DayTemplateTests
     private static Mock<InputFetcher> PrepareInput()
     {
         var inputMock = new Mock<InputFetcher> { CallBase = true };
-        inputMock.Setup(m => m.FetchInputAsString(2)).Returns(Task.FromResult(@""));
+        inputMock.Setup(m => m.FetchInputAsString(It.IsAny<int>())).Returns(Task.FromResult(@""));
         return inputMock;
     }
 }
