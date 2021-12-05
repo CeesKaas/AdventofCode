@@ -84,22 +84,23 @@ public class Day5
 
         var twoCountPart1 = 0;
         var twoCountPart2 = 0;
-        for (int x = 0; x <= bounds.X; x++)
+
+        foreach (var item in fieldPart1)
         {
-            for (int y = 0; y <= bounds.Y; y++)
+            if (item >= 2)
             {
-                if (fieldPart1[x, y] >= 2)
-                {
-                    twoCountPart1++;
-                }
-                if (fieldPart2[x, y] >= 2)
-                {
-                    twoCountPart2++;
-                }
-                //Console.Write($"{field[x, y]} ");
+                twoCountPart1++;
             }
-            //Console.WriteLine();
         }
+
+        foreach (var item in fieldPart2)
+        {
+            if (item >= 2)
+            {
+                twoCountPart2++;
+            }
+        }
+
         return (twoCountPart1, twoCountPart2);
     }
 }
