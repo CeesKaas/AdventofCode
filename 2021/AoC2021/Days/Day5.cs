@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using System.Drawing.Imaging;
 using Utilities;
 using static System.Math;
 namespace AoC2021.Days;
@@ -83,24 +84,56 @@ public class Day5
         }
 
         var twoCountPart1 = 0;
-        var twoCountPart2 = 0;
 
-        foreach (var item in fieldPart1)
+        foreach (var cel in fieldPart1)
         {
-            if (item >= 2)
+            if (cel >= 2)
             {
                 twoCountPart1++;
             }
         }
 
-        foreach (var item in fieldPart2)
+        var twoCountPart2 = 0;
+
+        foreach (var cel in fieldPart2)
         {
-            if (item >= 2)
+            if (cel >= 2)
             {
                 twoCountPart2++;
             }
         }
 
+        if (OperatingSystem.IsWindows())
+        {
+            static Color GetColor(int lineCount)
+            {
+                switch (lineCount)
+                {
+                    case 0: return Color.White;
+                    case 1: return Color.Black;
+                    case 2: return Color.Red;
+                    case 3: return Color.Green;
+                    case 4: return Color.Blue;
+                    case 5: return Color.Yellow;
+                    case 6: return Color.Purple;
+                    case 7: return Color.Gray;
+                    default: return Color.HotPink;
+                }
+            }
+            var imagePart1 = new Bitmap(bounds.X + 1, bounds.Y + 1);
+            var imagePart2 = new Bitmap(bounds.X + 1, bounds.Y + 1);
+
+            for (int x = 0; x <= bounds.X; x++)
+            {
+                for (int y = 0; y <= bounds.Y; y++)
+                {
+                    imagePart1.SetPixel(x, y, GetColor(fieldPart1[x, y]));
+                    imagePart2.SetPixel(x, y, GetColor(fieldPart2[x, y]));
+                }
+            }
+            imagePart1.Save("part1.bmp", ImageFormat.Bmp);
+            imagePart2.Save("part2.bmp", ImageFormat.Bmp);
+        }
         return (twoCountPart1, twoCountPart2);
     }
 }
