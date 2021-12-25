@@ -4,6 +4,7 @@ namespace AoC2021.Days;
 
 public class DayTemplate
 {
+    private readonly int Day = int.Parse(nameof(DayTemplate).Replace("Day", ""));
     private readonly IInputFetcher _inputFetcher;
     public DayTemplate(IInputFetcher? inputFetcher = null)
     {
@@ -18,6 +19,7 @@ public class DayTemplate
 
     public async Task<int> Part1()
     {
+        var input = await _inputFetcher.FetchInputAsStrings(Day);
         return 0;
     }
 
