@@ -8,9 +8,9 @@ public class InputFetcher : IInputFetcher
     public virtual async Task<string> FetchInputAsString(int day)
     {
         const string cachePath = @"inputs";
-		const string marker = "2022";
-		var currentLocation = Directory.GetCurrentDirectory();
-		var baseDirectory = currentLocation.Substring(0,currentLocation.IndexOf(marker)+marker.Length);
+        const string marker = "2022";
+        var currentLocation = Directory.GetCurrentDirectory();
+        var baseDirectory = currentLocation.Substring(0,currentLocation.IndexOf(marker)+marker.Length);
         string cacheFileName = Path.Combine(baseDirectory, cachePath, $"day{day}.input");
         if (File.Exists(cacheFileName))
         {

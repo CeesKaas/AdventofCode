@@ -16,10 +16,10 @@
   </ItemGroup>
 
 
-	<ItemGroup>
-		<ProjectReference Include="..\AoC2022\AoC2022.csproj" />
-	</ItemGroup>
-	<ItemGroup>
-		<Compile Remove="DayTests\DayTemplateTests.cs" />
-	</ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\AoC2022\AoC2022.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+        <Compile Remove="DayTests\DayTemplateTests.cs" />
+    </ItemGroup>
 </Project>
