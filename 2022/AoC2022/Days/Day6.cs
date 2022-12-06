@@ -33,29 +33,22 @@ public class Day6
 
     private int FindStartOfPacket(ReadOnlySpan<char> input) => FindIndexOfAfterMarker(input, 4);
     private int FindStartOfMessage(ReadOnlySpan<char> input) => FindIndexOfAfterMarker(input, 14);
+
     private int FindIndexOfAfterMarker(ReadOnlySpan<char> input, int markerLength)
     {
-        var marker = new List<char>(markerLength-1);
-        for (int i = 0; i < input.Length; i++)
+        var maybeMarkerStart = 0;
+        for (int i = 1; i < input.Length; i++)
         {
-            var currentIndexInMarker = marker.IndexOf(input[i]);
+            var maybeMarker = input[maybeMarkerStart..i];
+            if (maybeMarker.Length == markerLength)
+            {
+                return i;
+            }
+            var currentChar = input[i];
+            var currentIndexInMarker = maybeMarker.IndexOf(currentChar);
             if (currentIndexInMarker >= 0)
             {
-                do
-                {
-                    marker.RemoveAt(0);
-                    currentIndexInMarker--;
-                }
-                while (currentIndexInMarker >= 0);
-                marker.Add(input[i]);
-            }
-            else if (marker.Count < markerLength - 1)
-            {
-                marker.Add(input[i]);
-            }
-            else
-            {
-                return i + 1;
+                maybeMarkerStart += currentIndexInMarker + 1;
             }
         }
         return -1;
