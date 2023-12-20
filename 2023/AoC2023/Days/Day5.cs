@@ -1,3 +1,5 @@
+using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Utilities;
 
@@ -20,30 +22,56 @@ public class Day5
         });
     }
 
-    internal async Task Start()
+    internal void Start()
     {
-        Console.WriteLine($"Day 5 part 1 answer: {await Part1()}");
-        Console.WriteLine($"Day 5 part 2 answer: {await Part2()}");
+        var sw = Stopwatch.StartNew();
+        var prefill = _parsedSource.Value;
+        Console.WriteLine($"parse took {sw.Elapsed} {prefill.Seeds}");
+        sw.Restart();
+        Console.WriteLine($"Day 5 part 1 answer: {Part1()}");
+        Console.WriteLine($"part 1 took {sw.Elapsed}");
+        sw.Restart();
+        Console.WriteLine($"Day 5 part 2 answer: {Part2()}");
+        Console.WriteLine($"part 2 took {sw.Elapsed}");
+        sw.Restart();
+        Console.WriteLine($"Day 5 part 1 answer: {Part1()}");
+        Console.WriteLine($"part 1 took {sw.Elapsed}");
+        sw.Restart();
+        Console.WriteLine($"Day 5 part 2 answer: {Part2()}");
+        Console.WriteLine($"part 2 took {sw.Elapsed}");
+        sw.Restart();
+        Console.WriteLine($"Day 5 part 1 answer: {Part1()}");
+        Console.WriteLine($"part 1 took {sw.Elapsed}");
+        sw.Restart();
+        Console.WriteLine($"Day 5 part 2 answer: {Part2()}");
+        Console.WriteLine($"part 2 took {sw.Elapsed}");
     }
 
-    public async Task<long> Part1()
+    public long Part1()
     {
-        var (seeds,almanac) = _parsedSource.Value;
+        var (seeds, almanac) = _parsedSource.Value;
         var locations = seeds.Select(almanac.MapSeedToLocation);
         return locations.Min();
     }
 
-    public async Task<long> Part2()
+    public long Part2()
     {
         var (seedsRanges, almanac) = _parsedSource.Value;
-        var mappedLocations = new List<long>();
-        for (int i = 0; i < seedsRanges.Length; i+=2)
+        var mappedLocations = new ConcurrentBag<long>();
+        var mapperRanges = new List<MapperRange>();
+        for (int i = 0; i < seedsRanges.Length; i += 2)
         {
             long seed = seedsRanges[i];
             long numberOfSeeds = seedsRanges[i + 1];
-            var mappedLocationRanges = almanac.MapSeedRangeToLocation(new MapperRange(seed, numberOfSeeds));
-            mappedLocations.Add(mappedLocationRanges.Min(r=>r.Start));
+            mapperRanges.Add(new MapperRange(seed, numberOfSeeds));
         }
+        //Parallel.ForEach(mapperRanges, mapper =>
+        foreach (var mapper in mapperRanges)
+        {
+            var mappedLocationRanges = almanac.MapSeedRangeToLocation(mapper);
+
+            mappedLocations.Add(mappedLocationRanges.Min(r => r.Start));
+        }//);
         return mappedLocations.Min();
     }
 
@@ -64,6 +92,7 @@ public class Day5
                 }
                 if (line.EndsWith("map:"))
                 {
+                    mapper?.FillEmptySections();
                     mapper = new Mapper(line);
                     maps.Add(mapper);
                 }
@@ -91,6 +120,7 @@ public class Day5
             foreach (var map in _maps)
             {
                 var newCurrent = new List<MapperRange>();
+                //Console.WriteLine($"need to check {current.Count}");
                 foreach (var item in current)
                 {
                     newCurrent.AddRange(map.ConvertRange(item));
@@ -119,14 +149,12 @@ public class Day5
             {
                 return current;
             }
-            var offset = current - matchingLine.SourceStart;
-            return matchingLine.DestinationStart + offset;
+            //var offset = current - matchingLine.SourceStart;
+            return current + matchingLine.Offset;
         }
-
 
         public List<MapperRange> ConvertRange(MapperRange input)
         {
-            FillEmptySections();
             var result = new List<MapperRange>();
 
             var remainingRange = input;
@@ -139,18 +167,18 @@ public class Day5
                     result.Add(remainingRange);
                     return result;
                 }
-                var offset = remainingRange.Start - matchingLine.SourceStart;
-                var matchingLength = Math.Min(matchingLine.RangeLength - offset, remainingRange.Length);
+                var offsetWithinRange = remainingRange.Start - matchingLine.SourceStart;
+                var matchingLength = Math.Min(matchingLine.RangeLength - offsetWithinRange, remainingRange.Length);
 
-                result.Add(new MapperRange(matchingLine.DestinationStart + offset, matchingLength));
+                result.Add(new MapperRange(remainingRange.Start + matchingLine.Offset, matchingLength));
                 remainingRange = new MapperRange(remainingRange.Start + matchingLength, remainingRange.Length - matchingLength);
-                Console.WriteLine(remainingRange);
+                //Console.WriteLine(remainingRange);
             }
 
             return result;
         }
 
-        private void FillEmptySections()
+        public void FillEmptySections()
         {
             if (_filled) return;
 
@@ -161,7 +189,7 @@ public class Day5
             {
                 if (current < item.SourceStart)
                 {
-                    _lines.Add(new MapperLine(current,current,item.SourceStart));
+                    _lines.Add(new MapperLine(current, current, item.SourceStart, 0));
                 }
                 current = item.SourceStart + item.RangeLength + 1;
             }
@@ -172,14 +200,14 @@ public class Day5
         public void AddLine(string line)
         {
             var items = line.Split(' ').Select(long.Parse).ToArray();
-            _lines.Add(new(items[0], items[1], items[2]));
+            _lines.Add(new(items[0], items[1], items[2], items[0] - items[1]));
         }
     }
-    private readonly record struct MapperLine(long DestinationStart, long SourceStart, long RangeLength)
+    private readonly record struct MapperLine(long DestinationStart, long SourceStart, long RangeLength, long Offset)
     {
         public bool Match(long current)
         {
-            return SourceStart <= current 
+            return SourceStart <= current
                 && current < SourceStart + RangeLength;
         }
     }
