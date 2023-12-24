@@ -1,4 +1,6 @@
 using System.Collections.Immutable;
+using System.Diagnostics;
+using System.Text;
 using Utilities;
 using static AoC2023.Days.Day7;
 
@@ -17,31 +19,86 @@ public class Day7
 
     internal async Task Start()
     {
-        Console.WriteLine($"Day 7 part 1 answer: {await Part1()}");
-        Console.WriteLine($"Day 7 part 2 answer: {await Part2()}");
+        var sw = Stopwatch.StartNew();
+        Console.WriteLine($"Day 7 part 1 answer: {Part1()}");
+        Console.WriteLine($"Day 7 part 2 answer: {Part2()}");
+        Console.WriteLine($"Day 7 part 1 answer: {Part1Parallel()}");
+        Console.WriteLine($"Day 7 part 2 answer: {Part2Parallel()}");
+        sw.Stop();
+        Console.WriteLine($"Warmup tool {sw.Elapsed}");
+        const int _runs = 10_000;
+        {
+            var simple = new List<(TimeSpan, long)>();
+            var parallel = new List<(TimeSpan, long)>();
+            long answer;
+            for (int i = 0; i < _runs; i++)
+            {
+                sw.Restart();
+                answer = Part1();
+                simple.Add((sw.Elapsed, answer));
+                sw.Restart();
+                answer = Part1Parallel();
+                parallel.Add((sw.Elapsed, answer));
+            }
+            Console.WriteLine($"part 1 simple took {TimeSpan.FromTicks((long)simple.Select(_ => _.Item1.Ticks).Average())}");
+            Console.WriteLine($"part 1 parallel took {TimeSpan.FromTicks((long)parallel.Select(_ => _.Item1.Ticks).Average())}");
+        }
+        {
+            var simple = new List<(TimeSpan, long)>();
+            var parallel = new List<(TimeSpan, long)>();
+            long answer;
+            for (int i = 0; i < _runs; i++)
+            {
+                sw.Restart();
+                answer = Part2();
+                simple.Add((sw.Elapsed, answer));
+                sw.Restart();
+                answer = Part2Parallel();
+                parallel.Add((sw.Elapsed, answer));
+            }
+            Console.WriteLine($"part 2 simple took {TimeSpan.FromTicks((long)simple.Select(_ => _.Item1.Ticks).Average())}");
+            Console.WriteLine($"part 2 parallel took {TimeSpan.FromTicks((long)parallel.Select(_ => _.Item1.Ticks).Average())}");
+        }
     }
 
-    public async Task<long> Part1()
+    public long Part1()
     {
-        var sorted = _input.Value.OrderBy(_ => _.hand, HandComparer.Part1).ToList();
-        var accumulate = 0l;
-        for (var i = 0; i < sorted.Count; i++)
-        {
-            accumulate += sorted[i].Bid * (i + 1);
-        }
-        return accumulate;
+        return _input.Value
+            .OrderBy(_ => _.hand, HandComparer.Part1)
+            .Select(CalulateWinnings)
+            .Sum();
     }
 
-    public async Task<long> Part2()
+    public long Part2()
     {
-        var sorted = _input.Value.OrderBy(_ => _.hand, HandComparer.Part2).ToList();
-        var accumulate = 0l;
-        for (var i = 0; i < sorted.Count; i++)
-        {
-            accumulate += sorted[i].Bid * (i + 1);
-        }
-        return accumulate;
+
+        return _input.Value
+            .OrderBy(_ => _.hand, HandComparer.Part2)
+            .Select(CalulateWinnings)
+            .Sum();
     }
+
+    public long Part1Parallel()
+    {
+
+        return _input.Value.AsParallel()
+            .OrderBy(_ => _.hand, HandComparer.Part1)
+            .Select(CalulateWinnings)
+            .Sum();
+    }
+    public long Part2Parallel()
+    {
+        return _input.Value.AsParallel()
+            .OrderBy(_ => _.hand, HandComparer.Part2)
+            .Select(CalulateWinnings)
+            .Sum();
+    }
+
+    private static long CalulateWinnings((Hand hand, long Bid) handBid, int index)
+    {
+        return handBid.Bid * (index + 1);
+    }
+
 
     public static (Hand hand, long Bid) ParseHandAndBid(string input)
     {
@@ -66,11 +123,11 @@ public class Day7
 
     public class HandComparer : IComparer<Hand>
     {
-        public static readonly HandComparer Part1 = new (false);
-        public static readonly HandComparer Part2 = new (true);
+        public static readonly HandComparer Part1 = new(false);
+        public static readonly HandComparer Part2 = new(true);
         private readonly bool _jackAsJoker;
 
-        private HandComparer(bool jackAsJoker) 
+        private HandComparer(bool jackAsJoker)
         {
             _jackAsJoker = jackAsJoker;
         }

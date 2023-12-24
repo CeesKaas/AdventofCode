@@ -11,18 +11,18 @@ namespace AoC2023.UnitTests.DayTests;
 internal class Day7Tests
 {
     [Test]
-    public async Task TestDay7Part1()
+    public void TestDay7Part1()
     {
         var inputMock = PrepareInput();
         var objUnderTest = new Day7(inputMock);
-        Assert.That(await objUnderTest.Part1(), Is.EqualTo(6440));
+        Assert.That(objUnderTest.Part1(), Is.EqualTo(6440));
     }
     [Test]
-    public async Task TestDay7Part2()
+    public void TestDay7Part2()
     {
         var inputMock = PrepareInput();
         var objUnderTest = new Day7(inputMock);
-        Assert.That(await objUnderTest.Part2(), Is.EqualTo(5905));
+        Assert.That(objUnderTest.Part2(), Is.EqualTo(5905));
     }
 
     private static InputFetcher PrepareInput()
