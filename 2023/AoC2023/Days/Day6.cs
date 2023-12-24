@@ -58,7 +58,7 @@ public class Day6
         var input = await _inputFetcher.FetchInputAsStrings(Day);
         var timeAvailable = long.Parse(string.Join("",input[0].Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)[1..]));
         var existingRecord = long.Parse(string.Join("", input[1].Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)[1..]));
-        long accumulate = 1;
+        
         long msToWaitAtStart = 1;
         while (!BeatsRecord(msToWaitAtStart, timeAvailable, existingRecord))
         {

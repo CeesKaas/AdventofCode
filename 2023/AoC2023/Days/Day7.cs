@@ -65,7 +65,7 @@ public class Day7
     {
         return _input.Value
             .OrderBy(_ => _.hand, HandComparer.Part1)
-            .Select(CalulateWinnings)
+            .Select(CalculateWinnings)
             .Sum();
     }
 
@@ -74,7 +74,7 @@ public class Day7
 
         return _input.Value
             .OrderBy(_ => _.hand, HandComparer.Part2)
-            .Select(CalulateWinnings)
+            .Select(CalculateWinnings)
             .Sum();
     }
 
@@ -83,18 +83,18 @@ public class Day7
 
         return _input.Value.AsParallel()
             .OrderBy(_ => _.hand, HandComparer.Part1)
-            .Select(CalulateWinnings)
+            .Select(CalculateWinnings)
             .Sum();
     }
     public long Part2Parallel()
     {
         return _input.Value.AsParallel()
             .OrderBy(_ => _.hand, HandComparer.Part2)
-            .Select(CalulateWinnings)
+            .Select(CalculateWinnings)
             .Sum();
     }
 
-    private static long CalulateWinnings((Hand hand, long Bid) handBid, int index)
+    private static long CalculateWinnings((Hand hand, long Bid) handBid, int index)
     {
         return handBid.Bid * (index + 1);
     }
