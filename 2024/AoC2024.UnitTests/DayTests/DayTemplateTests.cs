@@ -14,21 +14,21 @@ internal class DayTemplateTests
     public async Task TestDayTemplatePart1()
     {
         var inputMock = PrepareInput();
-        var objUnderTest = new DayTemplate(inputMock.Object);
+        var objUnderTest = new DayTemplate(inputMock);
         Assert.That(await objUnderTest.Part1(), Is.EqualTo(0));
     }
     [Test]
     public async Task TestDayTemplatePart2()
     {
         var inputMock = PrepareInput();
-        var objUnderTest = new DayTemplate(inputMock.Object);
+        var objUnderTest = new DayTemplate(inputMock);
         Assert.That(await objUnderTest.Part2(), Is.EqualTo(0));
     }
 
-    private static Mock<InputFetcher> PrepareInput()
+    private static InputFetcher PrepareInput()
     {
         var inputMock = Substitute.For<InputFetcher>();
-        inputMock.When(m => m.FetchInputAsString(Arg.Any<int>())).Returns(Task.FromResult("""
+        inputMock.FetchInputAsString(Arg.Any<int>()).Returns(Task.FromResult("""
         """));
         inputMock.WhenForAnyArgs(m => m.FetchInputAsStrings(Arg.Any<int>())).CallBase();
         return inputMock;
